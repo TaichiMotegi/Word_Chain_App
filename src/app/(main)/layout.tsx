@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const MainLayout = ({
   children,
 }: Readonly<{
@@ -6,10 +8,13 @@ const MainLayout = ({
   return (
     <div>
       <header>
-        <div className="mx-auto flex  p-5  justify-center">
-          <h1 className="text-center text-xl text-gray-600 font-bold">
-            しりとりゲーム
-          </h1>
+        <div className="mx-auto flex p-5 justify-center">
+          <Link
+            href="/"
+            className="text-center text-xl text-gray-600 font-bold"
+          >
+            <div>しりとりゲーム</div>
+          </Link>
         </div>
       </header>
       <div className="flex h-screen">
