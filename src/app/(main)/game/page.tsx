@@ -1,101 +1,111 @@
 "use client";
 import { useState } from "react";
 import { normalizedString } from "@/utils/normalizedStr";
-import Swal from "sweetalert2";
+import { Timer } from "@/components/Timer";
+import { alertGameOver } from "@/utils/alertGameOver";
+import { Warning } from "@/components/Warning";
 
 export default function GamePage() {
   const [word, setWord] = useState("");
   const [answer, setAnswer] = useState<string[]>(["りんご"]);
   const [disabled, setDisabled] = useState(false);
-  const [cheat, setCheat] = useState(false);
+  const [invisible, setInvisible] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [worning, setWorning] = useState("worning");
+  const [time, setTime] = useState(5);
 
   const handleClick = () => {
-    let first = word.slice(0, 1);
-    let end = answer[0].replace(/ー|-/g, "").slice(-1);
-    if (word.endsWith("ん")) {
-      Swal.fire({
-        icon: "error",
-        title: "GAME OVER",
-        text: "語尾がんで終わってしまいました",
-        showCancelButton: true,
-        confirmButtonText: "Restart",
-        cancelButtonText: "Exit",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setWord("");
-          setAnswer(["りんご"]);
-          setCheat(false);
-        } else {
-          setDisabled(true);
-          setWord("");
-          setCheat(false);
-        }
-      });
+    const containsNonHiragana = /[^ぁ-ん]/.test(word);
+    const first = word.slice(0, 1);
+    const end = answer[0].replace(/ー|-/g, "").slice(-1);
+    if (containsNonHiragana) {
+      setInvisible(false);
+      setWord("");
+      setWorning("ひらがなのみで入力してください");
       return;
     } else if (normalizedString(first) !== normalizedString(end)) {
-      setCheat(true);
+      setInvisible(false);
       setWord("");
+      setWorning("相手の語尾で始まる単語を入力してください");
+      return;
+    } else if (word.endsWith("ん")) {
+      alertGameOver({
+        text: "語尾がんで終わってしまいました",
+        isPaused,
+        setWord,
+        setAnswer,
+        setInvisible,
+        setDisabled,
+        setIsPaused,
+        setTime,
+      });
       return;
     } else if (answer.includes(word)) {
-      Swal.fire({
-        icon: "error",
-        title: "GAME OVER",
+      alertGameOver({
         text: "一度使用した単語を使ってしまいました",
-        showCancelButton: true,
-        confirmButtonText: "Restart",
-        cancelButtonText: "Exit",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setWord("");
-          setAnswer(["りんご"]);
-          setCheat(false);
-        } else {
-          setDisabled(true);
-          setWord("");
-          setCheat(false);
-        }
+        isPaused,
+        setWord,
+        setAnswer,
+        setInvisible,
+        setDisabled,
+        setIsPaused,
+        setTime,
       });
       return;
     }
     setAnswer((prevAnswer: string[]): string[] => {
       const newWord = [word, ...prevAnswer];
       setWord("");
-      setCheat(false);
+      setInvisible(true);
+      setTime(5);
       return newWord;
     });
   };
 
   return (
-    <div className="h-screen flex justify-around items-center">
-      <div className="w-1/2 flex flex-col justify-center items-center">
-        <h1 className="text-5xl font-bold mt">{answer.slice(0)[0]}</h1>
-        <form action={handleClick} className="w-8/12 mt-5">
+    <div className="h-screen flex items-center">
+      <div className="w-1/2 flex flex-col items-center">
+        <Timer
+          time={time}
+          answer={answer}
+          isPaused={isPaused}
+          setTime={setTime}
+          setWord={setWord}
+          setAnswer={setAnswer}
+          setInvisible={setInvisible}
+          setIsPaused={setIsPaused}
+          setDisabled={setDisabled}
+        />
+        <h1 className="mt-20 text-5xl font-bold">{answer.slice(0)[0]}</h1>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleClick();
+          }}
+          className="w-8/12 mt-5"
+        >
           <div>
             <input
               value={word}
               onChange={(e) => {
                 setWord(e.target.value.trim());
               }}
-              className="text-4xl text-center block mt-2 py-6 px-2 w-full rounded-md border-0 shadow-sm ring-1 ring-inset ring-gray-300"
+              className="text-4xl text-center block mt-2 mb-4 py-6 px-2 w-full leading-5 rounded-md border-0 shadow-sm ring-1 ring-inset ring-gray-300"
               disabled={disabled}
             />
           </div>
-          <div
-            className={`text-red-500 font-semibold ${
-              cheat === true ? "" : "invisible"
-            }`}
-          >
-            相手の語尾で始まる単語を入力してください
-          </div>
+          <Warning text={worning} invisible={invisible} />
           <div className="text-center">
             <button
               type="button"
               onClick={() => {
                 setAnswer(["りんご"]);
                 setDisabled(false);
-                setCheat(false);
+                setInvisible(true);
+                setTime(5);
+                setIsPaused(false);
               }}
-              className="mt-8 py-3 w-3/4 rounded-full text-white bg-gray-800 hover:bg-gray-700 text-md font-semibold"
+              className="py-5 w-1/2 rounded-md text-white bg-indigo-700 hover:bg-indigo-500 text-xl text-md font-semibold"
             >
               Restart
             </button>
@@ -103,17 +113,21 @@ export default function GamePage() {
         </form>
       </div>
       <div className="w-1/2 h-[calc(100vh-300px)] flex justify-center items-start overflow-y-auto">
-        <table className="w-3/4">
+        <table className="w-3/5">
           <tbody>
-            {answer.map((word) => {
-              return (
-                <tr key={word} className="">
-                  <td className="border-b-2 border-solid border-blueGray-100 py-3 text-3xl whitespace-nowrap font-semibold text-center">
-                    {word}
-                  </td>
-                </tr>
-              );
-            })}
+            {answer.map((word, index) => (
+              <tr
+                key={index}
+                className="flex border-b-2 border-solid border-blueGray-100"
+              >
+                <td className="flex-1 py-3 text-3xl whitespace-nowrap font-semibold text-center">
+                  {word}
+                </td>
+                <td className="flex-none py-3 text-2xl whitespace-nowrap font-mono text-center">
+                  {answer.length - index}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
