@@ -6,7 +6,7 @@ type WarningProps = {
 export const Warning: React.FC<WarningProps> = ({ text, invisible }) => {
   return (
     <div
-      className={`pb-20 items-center text-red-500 font-semibold ${
+      className={`pb-20 items-center text-center text-xl text-red-500 font-semibold ${
         invisible === true ? "invisible" : ""
       }`}
     >

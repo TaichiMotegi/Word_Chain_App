@@ -48,5 +48,5 @@ export const Timer: React.FC<TimerProps> = ({
     return () => clearInterval(id);
   }, [time, isPaused]);
 
-  return <div className="text-8xl text-red-500">{time}</div>;
+  return <div className="text-9xl text-red-500">{time}</div>;
 };
