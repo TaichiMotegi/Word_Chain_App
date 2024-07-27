@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import { generateWord } from "./generateWord";
 
 type AlertGameOverProps = {
   score: number;
@@ -29,7 +30,7 @@ export const alertScore = ({
   }).then((result) => {
     if (result.isConfirmed) {
       setWord("");
-      setAnswer(["りんご"]);
+      setAnswer([generateWord()]);
       setInvisible(true);
       setDisabled(false);
       setTime(5);
