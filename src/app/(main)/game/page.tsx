@@ -4,14 +4,16 @@ import { normalizedString } from "@/utils/normalizedString";
 import { Timer } from "@/components/Timer";
 import { alertGameOver } from "@/utils/alertGameOver";
 import { Warning } from "@/components/Warning";
+import { generateWord } from "@/utils/generateWord";
 
 export default function GamePage() {
   const [word, setWord] = useState("");
-  const [answer, setAnswer] = useState<string[]>(["りんご"]);
+  const [answer, setAnswer] = useState<string[]>([generateWord()]);
   const [disabled, setDisabled] = useState(false);
   const [invisible, setInvisible] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [worning, setWorning] = useState("worning");
+  const [infoColor, setInfoColor] = useState(true);
   const [time, setTime] = useState(5);
 
   const handleClick = async () => {
@@ -22,12 +24,14 @@ export default function GamePage() {
     if (containsNonHiragana) {
       setInvisible(false);
       setWord("");
+      setInfoColor(true);
       setWorning("ひらがなのみで入力してください");
       setIsPaused(false);
       return;
     } else if (normalizedString(first) !== normalizedString(end)) {
       setInvisible(false);
       setWord("");
+      setInfoColor(true);
       setWorning("相手の語尾で始まる単語を入力してください");
       setIsPaused(false);
       return;
@@ -58,6 +62,7 @@ export default function GamePage() {
     } else if (!(await checkExist(word))) {
       setInvisible(false);
       setWord("");
+      setInfoColor(true);
       setWorning("Wikipediaに存在しない単語です");
       setIsPaused(false);
       return;
@@ -74,6 +79,9 @@ export default function GamePage() {
   };
 
   const checkExist = async (query: string): Promise<boolean> => {
+    setInvisible(false);
+    setInfoColor(false);
+    setWorning("Wikipedia検索中...");
     const response = await fetch("/api/checkExist", {
       method: "POST",
       headers: {
@@ -123,12 +131,12 @@ export default function GamePage() {
               autoFocus
             />
           </div>
-          <Warning text={worning} invisible={invisible} />
+          <Warning text={worning} color={infoColor} invisible={invisible} />
           <div className="text-center">
             <button
               type="button"
               onClick={() => {
-                setAnswer(["りんご"]);
+                setAnswer([generateWord()]);
                 setDisabled(false);
                 setInvisible(true);
                 setTime(5);
