@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function MainPage() {
   return (
-    <div className="h-screen flex flex-col items-center">
+    <div className="flex flex-col items-center">
       <h1 className="text-3xl mt-20">
         しりとりソロプレイ！ 1回答5秒以内で何単語答えられるか挑戦しよう！
       </h1>
