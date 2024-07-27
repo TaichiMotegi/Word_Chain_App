@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const YAHOO_API_URL = process.env.YAHOO_API_URL;
@@ -66,14 +65,14 @@ const checkWordInWikipedia = async (word: string): Promise<boolean> => {
   return !data.query.pages.hasOwnProperty("-1");
 };
 
-export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
+export const POST = async (req: NextRequest, res: NextResponse) => {
   // ReadableStreamからデータを読み取る
-  const reader = req.body.getReader();
+  const reader = req.body?.getReader(); // Add null check using optional chaining operator
   let body = "";
   const decoder = new TextDecoder();
 
   while (true) {
-    const { done, value } = await reader.read();
+    const { done, value } = (await reader?.read()) ?? {};
     if (done) break;
     body += decoder.decode(value, { stream: true });
   }
