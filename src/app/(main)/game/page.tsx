@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { normalizedString } from "@/utils/normalizedString";
 import { Timer } from "@/components/Timer";
 import { alertGameOver } from "@/utils/alertGameOver";
@@ -15,8 +15,11 @@ export default function GamePage() {
   const [worning, setWorning] = useState("worning");
   const [infoColor, setInfoColor] = useState(true);
   const [time, setTime] = useState(5);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleClick = async () => {
+  const handleSubmit = async () => {
+    setDisabled(true);
     setIsPaused(true);
     const containsNonHiragana = /[^ぁ-んー]/.test(word);
     const first = word.slice(0, 1);
@@ -26,6 +29,8 @@ export default function GamePage() {
       setWord("");
       setInfoColor(true);
       setWorning("ひらがなのみで入力してください");
+      setDisabled(false);
+      setIsSubmitted(true);
       setIsPaused(false);
       return;
     } else if (normalizedString(first) !== normalizedString(end)) {
@@ -33,6 +38,8 @@ export default function GamePage() {
       setWord("");
       setInfoColor(true);
       setWorning("相手の語尾で始まる単語を入力してください");
+      setDisabled(false);
+      setIsSubmitted(true);
       setIsPaused(false);
       return;
     } else if (word.endsWith("ん")) {
@@ -64,18 +71,22 @@ export default function GamePage() {
       setWord("");
       setInfoColor(true);
       setWorning("Wikipediaに存在しない単語です");
+      setDisabled(false);
+      setIsSubmitted(true);
       setIsPaused(false);
       return;
+    } else {
+      setAnswer((prevAnswer: string[]): string[] => {
+        const newWord = [word, ...prevAnswer];
+        setWord("");
+        setInvisible(true);
+        setIsSubmitted(true);
+        setTime(5);
+        setDisabled(false);
+        setIsPaused(false);
+        return newWord;
+      });
     }
-
-    setAnswer((prevAnswer: string[]): string[] => {
-      const newWord = [word, ...prevAnswer];
-      setWord("");
-      setInvisible(true);
-      setTime(5);
-      setIsPaused(false);
-      return newWord;
-    });
   };
 
   const checkExist = async (query: string): Promise<boolean> => {
@@ -98,8 +109,15 @@ export default function GamePage() {
     return data.exists;
   };
 
+  useEffect(() => {
+    if (isSubmitted && inputRef.current) {
+      inputRef.current.focus();
+      setIsSubmitted(false);
+    }
+  }, [isSubmitted]);
+
   return (
-    <div className="flex items-center">
+    <div className="w-full flex items-center">
       <div className="w-3/5 mt-12 flex flex-col items-center">
         <Timer
           time={time}
@@ -116,12 +134,13 @@ export default function GamePage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleClick();
+            handleSubmit();
           }}
           className="w-8/12 mt-5"
         >
           <div>
             <input
+              ref={inputRef}
               value={word}
               onChange={(e) => {
                 setWord(e.target.value.trim());
@@ -149,8 +168,8 @@ export default function GamePage() {
           </div>
         </form>
       </div>
-      <div className="w-2/5 h-[calc(100vh-300px)] flex justify-start items-start overflow-y-auto">
-        <table className="w-3/5 mt-36">
+      <div className="w-1/4 h-[calc(100vh-300px)] flex justify-start items-start overflow-y-auto">
+        <table className="w-full">
           <tbody>
             {answer.map((word, index) => (
               <tr
