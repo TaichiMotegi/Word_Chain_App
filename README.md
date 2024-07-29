@@ -5,7 +5,7 @@
 また使用できる単語は Wikipedia に載っている単語のみです．
 しりとり力，タイピング速度，記憶力を鍛えよう！
 
-https://vercel.com/taichis-projects-f65c7c8f/word-chain-app
+https://word-chain-app.vercel.app/
 
 ## 仕様
 
