@@ -15,6 +15,7 @@ const words = [
   "らいち",
 ];
 
+// ランダムな単語を生成する関数
 export const generateWord = (): string => {
   const seed = Math.floor(Math.random() * words.length);
   const word = words[seed];

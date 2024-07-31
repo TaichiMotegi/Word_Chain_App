@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { generateWord } from "./generateWord";
 
-type AlertGameOverProps = {
+type AlertScoreProps = {
   score: number;
   isPaused: boolean;
   setWord: React.Dispatch<React.SetStateAction<string>>;
@@ -12,6 +12,7 @@ type AlertGameOverProps = {
   setTime: React.Dispatch<React.SetStateAction<number>>;
 };
 
+// スコアを表示する関数
 export const alertScore = ({
   score,
   setWord,
@@ -20,7 +21,7 @@ export const alertScore = ({
   setDisabled,
   setIsPaused,
   setTime,
-}: AlertGameOverProps) => {
+}: AlertScoreProps) => {
   setIsPaused(true);
   Swal.fire({
     title: `<div style="font-size:xxx-large; font-style: italic; color: #6633FF;">${score}words!</div>`,

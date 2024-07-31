@@ -7,23 +7,37 @@ import { Warning } from "@/components/Warning";
 import { generateWord } from "@/utils/generateWord";
 
 export default function GamePage() {
+  // 入力された単語を制御するためのstate
   const [word, setWord] = useState("");
+  // 回答された単語を制御するためのstate
   const [answer, setAnswer] = useState<string[]>([generateWord()]);
+  // inputタグのdisabled属性を制御するためのstate
   const [disabled, setDisabled] = useState(false);
+  // 警告文を表示するためのstate
   const [invisible, setInvisible] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
+  // 警告文を指定するためのstate
   const [worning, setWorning] = useState("worning");
+  // 警告文の色を指定するためのstate
   const [infoColor, setInfoColor] = useState(true);
+  // タイマーの時間を制御するためのstate
   const [time, setTime] = useState(5);
+  // タイマーを停止するためのstate
+  const [isPaused, setIsPaused] = useState(false);
+  // 回答が送信されたかどうかを判定するためのstate
   const [isSubmitted, setIsSubmitted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 入力された単語を処理する関数
   const handleSubmit = async () => {
     setDisabled(true);
     setIsPaused(true);
+    // ひらがなと長音符以外が含まれているかどうかを判定
     const containsNonHiragana = /[^ぁ-んー]/.test(word);
+    // 入力された単語の最初の文字を取得
     const first = word.slice(0, 1);
+    // 回答された単語の最後の文字を取得
     const end = answer[0].replace(/ー|-/g, "").slice(-1);
+    // ひらがな以外が含まれている場合の処理
     if (containsNonHiragana) {
       setInvisible(false);
       setWord("");
@@ -33,6 +47,7 @@ export default function GamePage() {
       setIsSubmitted(true);
       setIsPaused(false);
       return;
+      // 入力された単語が回答された単語の最後の文字で始まっていない場合の処理
     } else if (normalizedString(first) !== normalizedString(end)) {
       setInvisible(false);
       setWord("");
@@ -42,6 +57,7 @@ export default function GamePage() {
       setIsSubmitted(true);
       setIsPaused(false);
       return;
+      // 入力された単語が「ん」で終わっている場合の処理
     } else if (word.endsWith("ん")) {
       alertGameOver({
         text: "語尾がんで終わってしまいました",
@@ -54,6 +70,7 @@ export default function GamePage() {
         setTime,
       });
       return;
+      // 入力された単語がすでに使用されている場合の処理
     } else if (answer.includes(word)) {
       alertGameOver({
         text: "一度使用した単語を使ってしまいました",
@@ -66,6 +83,7 @@ export default function GamePage() {
         setTime,
       });
       return;
+      // wikipediaに存在しない単語が入力された場合の処理
     } else if (!(await checkExist(word))) {
       setInvisible(false);
       setWord("");
@@ -75,6 +93,7 @@ export default function GamePage() {
       setIsSubmitted(true);
       setIsPaused(false);
       return;
+      // 回答が正しい場合の処理
     } else {
       setAnswer((prevAnswer: string[]): string[] => {
         const newWord = [word, ...prevAnswer];
@@ -89,6 +108,7 @@ export default function GamePage() {
     }
   };
 
+  // wikipediaに単語が存在するかどうかAPIリクエストを送信する関数
   const checkExist = async (query: string): Promise<boolean> => {
     setInvisible(false);
     setInfoColor(false);
@@ -109,6 +129,7 @@ export default function GamePage() {
     return data.exists;
   };
 
+  // 回答した後にフォーカスをinputタグに移動する処理
   useEffect(() => {
     if (isSubmitted && inputRef.current) {
       inputRef.current.focus();

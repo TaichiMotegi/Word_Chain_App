@@ -12,6 +12,7 @@ type AlertGameOverProps = {
   setTime: React.Dispatch<React.SetStateAction<number>>;
 };
 
+// Game Over時のアラートを表示する関数
 export const alertGameOver = ({
   text,
   setWord,

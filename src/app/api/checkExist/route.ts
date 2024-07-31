@@ -19,9 +19,10 @@ type RequestPayload = {
   params: Params;
 };
 
+// クライアントから送信された回答をmedeiawikiAPIに渡す関数
 export const POST = async (req: NextRequest, res: NextResponse) => {
   // ReadableStreamからデータを読み取る
-  const reader = req.body?.getReader(); // Add null check using optional chaining operator
+  const reader = req.body?.getReader();
   let body = "";
   const decoder = new TextDecoder();
 
@@ -30,8 +31,8 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
     if (done) break;
     body += decoder.decode(value, { stream: true });
   }
+  // json形式に変換しクエリを取得
   const body_obj = JSON.parse(body);
-
   const query = body_obj.query;
 
   try {
@@ -43,6 +44,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
   }
 };
 
+// mediawikiAPIに変換候補を送信する関数
 const checkExist = async (query: string) => {
   try {
     const candidates = await convertQuery(query);
@@ -62,6 +64,7 @@ const checkExist = async (query: string) => {
   }
 };
 
+// YahooAPIにクエリを送信し変換候補を取得する関数
 const convertQuery = async (query: string): Promise<string[]> => {
   const headers = {
     "Content-Type": "application/json",
@@ -97,6 +100,7 @@ const convertQuery = async (query: string): Promise<string[]> => {
   return data.result.segment.flatMap((segment: any) => segment.candidate);
 };
 
+// wikipediaに単語が存在するかどうかAPIリクエストを送信する関数
 const checkWordInWikipedia = async (word: string): Promise<boolean> => {
   const url = `${WIKIPEDIA_API_URL}?format=json&action=query&prop=info&titles=${encodeURIComponent(
     word
