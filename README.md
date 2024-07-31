@@ -19,7 +19,7 @@ https://word-chain-app.vercel.app/
 - 回答した単語の履歴は画面右に表示されます
 - １回答５秒以内で答えらなかった場合，その時点で回答した単語数がアラートで表示されます
   - Wikipedia 内を検索している際はカウントが停止されます
-- 下記のような場合は Game 0ver のアラートが表示されます
+- 下記のような場合は Game Over のアラートが表示されます
   - 末尾が「ん」で終わる単語が入力されたら場合
   - 過去に使用した単語が入力された場合
 - Restart ボタンを押すと最初からやり直せます
@@ -28,10 +28,11 @@ https://word-chain-app.vercel.app/
 
 ## 参考資料
 
-### Next.js＆Reactz
+### Next.js＆React
 
 - [Next.js フルスタック Web アプリケーション開発入門](https://www.udemy.com/course/nextjs-fullstack/)
 - [Next js で学ぶ React 講座](https://www.youtube.com/watch?v=15WLMqnkPsE&list=PLwM1-TnN_NN6fUhOoZyU4iZiwhLyISopO&ab_channel=%E3%81%97%E3%81%BE%E3%81%B6%E3%83%BC%E3%81%AEIT%E5%A4%A7%E5%AD%A6)
+- [【React】useRef ~2 つの使い方とその背景~](https://qiita.com/hinako_n/items/1d041e71820148e8bf61)
 
 ### TypeScript
 
